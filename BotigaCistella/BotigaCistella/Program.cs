@@ -1,700 +1,648 @@
 ﻿using System;
-using System.IO;
 
-namespace BotigaiCistella
+class Producte
 {
-    class Program
+    private string nom;
+    private double preuSenseIVA;
+    private double iva;
+    private int quantitat;
+
+    // Constructors
+    public Producte()
     {
-        static Botiga botiga;
-        static Cistella cistella;
+        iva = 0.21; // IVA per defecte del 21%
+        quantitat = 0;
+    }
 
-        static void Main(string[] args)
+    public Producte(string nom, double preu)
+    {
+        this.nom = nom;
+        this.preuSenseIVA = preu;
+        iva = 0.21;
+        quantitat = 0;
+    }
+
+    public Producte(string nom, double preu, double iva, int quantitat)
+    {
+        this.nom = nom;
+        this.preuSenseIVA = preu;
+        this.iva = iva;
+        this.quantitat = quantitat;
+    }
+
+    // Properties
+    public string Nom
+    {
+        get { return nom; }
+        set { nom = value; }
+    }
+
+    public double PreuSenseIVA
+    {
+        get { return preuSenseIVA; }
+        set
         {
-            botiga = new Botiga("Mi Tienda", 20);
-
-            CargarDatos();
-
-            bool salir = false;
-            while (!salir)
-            {
-                Console.WriteLine("Benvingut a la botiga!");
-                Console.WriteLine("1. Comprador");
-                Console.WriteLine("2. Venedor");
-                Console.WriteLine("3. Sortir");
-                Console.Write("Escull una opció: ");
-                string opcio = Console.ReadLine();
-
-                switch (opcio)
-                {
-                    case "1":
-                        MenuComprador();
-                        Return();
-                        break;
-                    case "2":
-                        MenuVenedor();
-                        Return();
-                        break;
-                    case "3":
-                        salir = true;
-                        break;
-                    default:
-                        Console.WriteLine("Opció no vàlida. Torna a intentar-ho.");
-                        break;
-                }
-            }
-
-            GuardarDatos();
-        }
-
-        static void MenuComprador()
-        {
-            bool sortir = false;
-            while (!sortir)
-            {
-                Console.WriteLine("\nMenú Comprador");
-                Console.WriteLine("1. Mostrar productes disponibles");
-                Console.WriteLine("2. Afegir producte a la cistella");
-                Console.WriteLine("3. Mostrar cistella");
-                Console.WriteLine("4. Realitzar compra");
-                Console.WriteLine("5. Tornar al menú principal");
-                Console.Write("Escull una opció: ");
-                string opcio = Console.ReadLine();
-
-                switch (opcio)
-                {
-                    case "1":
-                        MostrarProductes();
-                        Return();
-                        break;
-                    case "2":
-                        AfegirProducteCistella();
-                        Return();
-                        break;
-                    case "3":
-                        MostrarCistella();
-                        Return();
-                        break;
-                    case "4":
-                        RealitzarCompra();
-                        Return();
-                        break;
-                    case "5":
-                        sortir = true;
-                        break;
-                    default:
-                        Console.WriteLine("Opció no vàlida. Torna a intentar-ho.");
-                        break;
-                }
-            }
-        }
-
-        static void MenuVenedor()
-        {
-            bool sortir = false;
-            while (!sortir)
-            {
-                Console.WriteLine("\nMenú Venedor");
-                Console.WriteLine("1. Mostrar productes de la botiga");
-                Console.WriteLine("2. Afegir producte a la botiga");
-                Console.WriteLine("3. Afegir productes a la botiga");
-                Console.WriteLine("4. Modificar preu");
-                Console.WriteLine("5. Buscar un producte");
-                Console.WriteLine("6. Modificar producte");
-                Console.WriteLine("7. Ordenar productes");
-                Console.WriteLine("8. Ordenar per preus");
-                Console.WriteLine("9. Esborrar producte");
-                Console.WriteLine("10. Indexador");
-                Console.WriteLine("11. To string");
-                Console.WriteLine("q. Tornar al menú principal");
-                Console.Write("Escull una opció: ");
-                string opcio = Console.ReadLine();
-
-                switch (opcio)
-                {
-                    case "1":
-                        botiga.Mostrar();
-                        break;
-                    case "2":
-                        AfegirProducteBotiga();
-                        break;
-                    case "3":
-                        //Botiga.AfegirProductes();
-                        break;
-                    case "4":
-                        Botiga.ModificarPreu();
-                        break;
-                    case "5":
-                        Botiga.BuscarProducte();
-                        break;
-                    case "6":
-                        Botiga.ModificarProducte();
-                        break;
-                    case "7":
-                        //Botiga.OrdenarProducte();
-                        break;
-                    case "8":
-                        //Botiga.OrdenarPreu();
-                        break;
-                    case "9":
-                        Botiga.EsborrarProducte();
-                        break;
-                    case "10":
-                        Botiga.Indexador();
-                        break;
-                    case "11":
-                        Botiga.ToString();
-                        break;
-                    case "q":
-                        sortir = true;
-                        break;
-                    default:
-                        Console.WriteLine("Opció no vàlida. Torna a intentar-ho.");
-                        break;
-                }
-            }
-        }
-
-        static void MostrarProductes()
-        {
-            Console.WriteLine("Productes disponibles:");
-            for (int i = 0; i < botiga.Productes.Length; i++)
-            {
-                Producte producte = botiga.Productes[i];
-                if (producte != null)
-                {
-                    Console.WriteLine($"{i + 1}. {producte}");
-                }
-            }
-        }
-
-        static void AfegirProducteCistella()
-        {
-            MostrarProductes();
-            Console.Write("Introdueix el número del producte que vols afegir a la cistella: ");
-            int indexProducte;
-            if (int.TryParse(Console.ReadLine(), out indexProducte))
-            {
-                Console.Write("Introdueix la quantitat: ");
-                int quantitat;
-                if (int.TryParse(Console.ReadLine(), out quantitat))
-                {
-                    Producte producteSeleccionat = botiga.ObtenirProducte(indexProducte);
-                    if (producteSeleccionat != null)
-                    {
-                        if (cistella == null)
-                        {
-                            cistella = new Cistella();
-                        }
-                        cistella.ComprarProducte(producteSeleccionat, quantitat);
-                    }
-                    else
-                    {
-                        Console.WriteLine("El producte seleccionat no és vàlid.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Quantitat no vàlida.");
-                }
-            }
+            if (value >= 0)
+                preuSenseIVA = value;
             else
-            {
-                Console.WriteLine("Número de producte no vàlid.");
-            }
-        }
-
-        static void MostrarCistella()
-        {
-            if (cistella == null)
-            {
-                Console.WriteLine("La cistella està buida.");
-            }
-            else
-            {
-                Console.WriteLine("Cistella:");
-                for (int i = 0; i < cistella.Productes.Length; i++)
-                {
-                    Producte producte = cistella.Productes[i];
-                    if (producte != null)
-                    {
-                        Console.WriteLine($"{i + 1}. {producte}");
-                    }
-                }
-            }
-        }
-
-        static void RealitzarCompra()
-        {
-            if (cistella == null || cistella.NElements == 0)
-            {
-                Console.WriteLine("La cistella està buida. No es pot realitzar la compra.");
-            }
-            else
-            {
-                Console.WriteLine("Compra realitzada amb èxit!");
-                cistella = null;
-            }
-        }
-
-        static void AfegirProducteBotiga()
-        {
-            Console.Write("Introdueix el nom del producte: ");
-            string nomProducte = Console.ReadLine();
-            Console.Write("Introdueix el preu del producte: ");
-            double preuProducte;
-            if (double.TryParse(Console.ReadLine(), out preuProducte))
-            {
-                Console.Write("Introdueix la quantitat del producte: ");
-                int quantitatProducte;
-                if (int.TryParse(Console.ReadLine(), out quantitatProducte))
-                {
-                    Producte nouProducte = new Producte(nomProducte, preuProducte);
-                    botiga.AfegirProducte(nouProducte, quantitatProducte);
-                    Console.WriteLine("Producte afegit amb èxit a la botiga.");
-                }
-                else
-                {
-                    Console.WriteLine("Quantitat no vàlida.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Preu no vàlid.");
-            }
-        }
-        static void GuardarDatos()
-        {
-            StreamWriter BotigaFitxer = null;
-            StreamWriter CistellaFitxer = null;
-
-            BotigaFitxer = new StreamWriter("botiga.csv");
-            for (int i = 0; i < botiga.Productes.Length; i++)
-            {
-                Producte producte = botiga.Productes[i];
-                if (producte != null)
-                {
-                    BotigaFitxer.WriteLine($"{producte.Nom},{producte.Preu},{producte.Quantitat}");
-                }
-            }
-            BotigaFitxer.Close();
-
-            if (cistella != null)
-            {
-                CistellaFitxer = new StreamWriter("cistella.csv");
-                for (int i = 0; i < cistella.Productes.Length; i++)
-                {
-                    Producte producte = cistella.Productes[i];
-                    if (producte != null)
-                    {
-                        CistellaFitxer.WriteLine($"{producte.Nom},{producte.Preu},{producte.Quantitat}");
-                    }
-                }
-                CistellaFitxer.Close();
-            }
-        }
-        static void CargarDatos()
-        {
-            if (File.Exists("botiga.csv"))
-            {
-                botiga = new Botiga();
-                StreamReader readerBotiga = new StreamReader("botiga.csv");
-                string line;
-                while ((line = readerBotiga.ReadLine()) != null)
-                {
-                    string[] parts = line.Split(',');
-                    string nom = parts[0];
-                    double preu = Convert.ToDouble(parts[1]);
-                    int quantitat = Convert.ToInt32(parts[2]);
-                    Producte producte = new Producte(nom, preu, quantitat);
-                    botiga.AfegirProducte(producte, quantitat);
-                }
-                readerBotiga.Close();
-            }
-
-            if (File.Exists("cistella.csv"))
-            {
-                cistella = new Cistella();
-                StreamReader readerCistella = new StreamReader("cistella.csv");
-                string line;
-                while ((line = readerCistella.ReadLine()) != null)
-                {
-                    string[] parts = line.Split(',');
-                    string nom = parts[0];
-                    double preu = Convert.ToDouble(parts[1]);
-                    int quantitat = Convert.ToInt32(parts[2]);
-                    Producte producte = new Producte(nom, preu, quantitat);
-                    cistella.ComprarProducte(producte, quantitat);
-                }
-                readerCistella.Close();
-            }
-        }
-        static void Return()
-        {
-            int i = 5;
-            while (i != 0)
-            {
-                Console.Write("\r");
-                Console.Write($"Tornant al menu : {i}s");
-                Thread.Sleep(1000);
-                i--;
-            }
-            Console.Clear();
+                Console.WriteLine("El preu no pot ser negatiu.");
         }
     }
-    class Producte
+
+    public double Iva
     {
-        private string nom;
-        private double preu;
-        private int quantitat;
-
-        public Producte()
+        get { return iva; }
+        set
         {
-            quantitat = 0;
-        }
-        public Producte(string nom, double preu) : this()
-        {
-            this.nom = nom;
-            this.preu = preu;
-        }
-        public Producte(string nom, double preu, int quantitat) : this(nom, preu)
-        {
-            this.quantitat = quantitat;
-        }
-        public string Nom
-        {
-            get { return nom; }
-            set
-            {
-                if (!string.IsNullOrEmpty(value))
-                    nom = value;
-                else
-                    Console.WriteLine("El nom no pot estar vuit");
-            }
-        }
-
-        public double Preu
-        {
-            get { return preu; }
-            set
-            {
-                if (value >= 0)
-                    preu = value;
-                else
-                    Console.WriteLine("El preu no pot ser negatiu");
-            }
-        }
-
-        public int Quantitat
-        {
-            get { return quantitat; }
-            set
-            {
-                if (value >= 0)
-                    quantitat = value;
-                else
-                    Console.WriteLine("La quantitat no pot ser negativa");
-            }
-        }
-
-        public override string ToString()
-        {
-            return $"Producte: {nom}, Preu: {preu}, Quantitat: {quantitat}";
+            if (value >= 0)
+                iva = value;
+            else
+                Console.WriteLine("L'IVA no pot ser negatiu.");
         }
     }
-    class Botiga
+
+    public int Quantitat
     {
-        private string nomBotiga;
-        private Producte[] productes;
-        private int nElements;
-
-        public Botiga()
+        get { return quantitat; }
+        set
         {
-            nomBotiga = "";
-            productes = new Producte[10];
-            nElements = 0;
-        }
-
-        public Botiga(string nom, int nombreProductes)
-        {
-            nomBotiga = nom;
-            productes = new Producte[nombreProductes];
-            nElements = 0;
-        }
-
-        public string NomBotiga
-        {
-            get { return nomBotiga; }
-            set { nomBotiga = value; }
-        }
-
-        public Producte[] Productes
-        {
-            get { return productes; }
-            set { productes = value; }
-        }
-
-        public int NElements
-        {
-            get { return nElements; }
-            set { nElements = value; }
-        }
-
-        public int EspaiLliure()
-        {
-            for (int i = 0; i < productes.Length; i++)
-            {
-                if (productes[i] == null)
-                {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
-        public Producte ObtenirProducte(int index)
-        {
-            if (index >= 0 && index < productes.Length)
-            {
-                return productes[index - 1];
-            }
+            if (value >= 0)
+                quantitat = value;
             else
-            {
-                Console.WriteLine("Índex de producte fora de límits.");
-                return null;
-            }
+                Console.WriteLine("La quantitat no pot ser negativa.");
         }
+    }
 
-        public void AfegirProducte(Producte producte, int quantitat)
+    // Métodos públicos
+    public double Preu()
+    {
+        return preuSenseIVA * (1 + iva);
+    }
+
+    public override string ToString()
+    {
+        return $"{nom}: {Preu()} € - Quantitat: {quantitat}";
+    }
+}
+
+class Botiga
+{
+    private string nomBotiga;
+    private Producte[] productes;
+    private int nElements;
+
+    // Constructors
+    public Botiga()
+    {
+        nomBotiga = "";
+        productes = new Producte[10];
+        nElements = 0;
+    }
+
+    public Botiga(string nom, int nombreProductes)
+    {
+        nomBotiga = nom;
+        productes = new Producte[nombreProductes];
+        nElements = 0;
+    }
+
+    public Botiga(string nom, Producte[] productes)
+    {
+        nomBotiga = nom;
+        this.productes = productes;
+        nElements = productes.Length;
+    }
+
+    // Properties
+    public string NomBotiga
+    {
+        get { return nomBotiga; }
+        set { nomBotiga = value; }
+    }
+
+    public int NElements
+    {
+        get { return nElements; }
+    }
+
+    // Métodos
+    public int EsapiLliure()
+    {
+        for (int i = 0; i < productes.Length; i++)
         {
-            if (producte != null && quantitat > 0)
-            {
-                int indexLliure = EspaiLliure();
-                if (indexLliure != -1)
-                {
-                    productes[indexLliure] = producte;
-                    producte.Quantitat += quantitat;
-                    nElements++;
-                }
-                else
-                {
-                    Console.WriteLine("No hi ha prou espai a la botiga.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Producte o quantitat no vàlids.");
-            }
+            if (productes[i] == null)
+                return i;
         }
-        public void Indexador(string nomProducte)
+        return -1;
+    }
+
+    public Producte this[string nomProducte]
+    {
+        get
         {
             for (int i = 0; i < nElements; i++)
             {
                 if (productes[i].Nom == nomProducte)
+                    return productes[i];
+            }
+            return null;
+        }
+    }
+
+    public bool AfegirProducte(Producte producte)
+    {
+        int posicio = EsapiLliure();
+        if (posicio != -1)
+        {
+            productes[posicio] = producte;
+            nElements++;
+            return true;
+        }
+        else
+        {
+            Console.WriteLine("No es pot afegir més productes. Vols ampliar la tenda?");
+            return false;
+        }
+    }
+
+    public bool AfegirProducte(Producte[] productesNous)
+    {
+        if (nElements + productesNous.Length <= productes.Length)
+        {
+            Array.Copy(productesNous, 0, productes, nElements, productesNous.Length);
+            nElements += productesNous.Length;
+            return true;
+        }
+        else
+        {
+            Console.WriteLine("No hi ha prou espai per afegir tots els productes. Vols ampliar la tenda?");
+            return false;
+        }
+    }
+
+    public void AmpliarBotiga(int num)
+    {
+        Array.Resize(ref productes, productes.Length + num);
+    }
+
+    public bool ModificarPreu(string nomProducte, double preu)
+    {
+        for (int i = 0; i < nElements; i++)
+        {
+            if (productes[i].Nom == nomProducte)
+            {
+                productes[i].PreuSenseIVA = preu;
+                return true;
+            }
+        }
+        Console.WriteLine("Producte no trobat.");
+        return false;
+    }
+
+    public bool BuscarProducte(Producte producte)
+    {
+        for (int i = 0; i < nElements; i++)
+        {
+            if (productes[i] == producte)
+                return true;
+        }
+        return false;
+    }
+
+    public bool ModificarProducte(Producte producte, string nouNom, double nouPreu, int novaQuantitat)
+    {
+        for (int i = 0; i < nElements; i++)
+        {
+            if (productes[i] == producte)
+            {
+                productes[i].Nom = nouNom;
+                productes[i].PreuSenseIVA = nouPreu;
+                productes[i].Quantitat = novaQuantitat;
+                return true;
+            }
+        }
+        Console.WriteLine("Producte no trobat.");
+        return false;
+    }
+
+    public void OrdenarProducte()
+    {
+        for (int i = 0; i < nElements - 1; i++)
+        {
+            for (int j = 0; j < nElements - 1 - i; j++)
+            {
+                if (string.Compare(productes[j].Nom, productes[j + 1].Nom) > 0)
                 {
-                    Console.WriteLine($"El {nomProducte} es troba a la posició: {i}");
-                    Console.WriteLine(productes[i]);
-                    return;
+                    Producte temp = productes[j];
+                    productes[j] = productes[j + 1];
+                    productes[j + 1] = temp;
                 }
             }
-            Console.WriteLine("No s'ha trobat el producte");
+        }
+    }
+
+    public void OrdenarPreus()
+    {
+        for (int i = 0; i < nElements - 1; i++)
+        {
+            for (int j = 0; j < nElements - 1 - i; j++)
+            {
+                if (productes[j].Preu() > productes[j + 1].Preu())
+                {
+                    Producte temp = productes[j];
+                    productes[j] = productes[j + 1];
+                    productes[j + 1] = temp;
+                }
+            }
+        }
+    }
+
+    public bool EsborrarProducte(Producte producte)
+    {
+        for (int i = 0; i < nElements; i++)
+        {
+            if (productes[i] == producte)
+            {
+                Array.Copy(productes, i + 1, productes, i, nElements - i - 1);
+                productes[nElements - 1] = null;
+                nElements--;
+                return true;
+            }
+        }
+        Console.WriteLine("Producte no trobat.");
+        return false;
+    }
+
+    public void Mostrar()
+    {
+        Console.WriteLine($"Botiga: {nomBotiga}");
+        for (int i = 0; i < nElements; i++)
+        {
+            Console.WriteLine(productes[i]);
+        }
+    }
+
+    public override string ToString()
+    {
+        string result = $"Botiga: {nomBotiga}\n";
+        int index = 0;
+        while (index < productes.Length && productes[index] != null)
+        {
+            result += $"{productes[index]}\n";
+            index++;
+        }
+        return result;
+    }
+}
+
+class Cistella
+{
+    private Botiga botiga;
+    private DateTime data;
+    private Producte[] productes;
+    private int[] quantitat;
+    private int nElements;
+    private double diners;
+
+    // Constructor
+    public Cistella()
+    {
+        botiga = null;
+        data = DateTime.Now;
+        productes = new Producte[10];
+        quantitat = new int[10];
+        nElements = 0;
+        diners = 0;
+    }
+
+    public Cistella(Botiga botiga, Producte[] productes, int[] quantitats, double diners)
+    {
+        this.botiga = botiga;
+        this.productes = new Producte[productes.Length];
+        Array.Copy(productes, this.productes, productes.Length);
+        this.quantitat = new int[quantitats.Length];
+        Array.Copy(quantitats, this.quantitat, quantitats.Length);
+        nElements = productes.Length;
+        this.diners = diners;
+    }
+
+    // Properties
+    public Producte[] Productes
+    {
+        get { return productes; }
+    }
+
+    public int NElements
+    {
+        get { return nElements; }
+    }
+
+    public double Diners
+    {
+        get { return diners; }
+        set { diners = value; }
+    }
+
+    public DateTime Data
+    {
+        get { return data; }
+    }
+
+    // Métodos
+    public void ComprarProducte(Producte producte, int quantitat)
+    {
+        if (botiga == null)
+        {
+            Console.WriteLine("No s'ha assignat cap botiga a la cistella.");
             return;
         }
 
-        public bool AfegirProducte(Producte producte)
+        if (nElements >= productes.Length)
         {
-            if (nElements < productes.Length)
-            {
-                productes[nElements] = producte;
-                nElements++;
-                Console.WriteLine("Producte afegit amb exit");
-                return true;
-            }
-            else
-            {
-                Console.WriteLine("La botiga està plena. Vols ampliar-la? (S/N)");
-                string resposta = Console.ReadLine();
-                if (resposta.ToLower() == "s")
-                {
-                    Console.WriteLine($"La botiga ara té {productes.Length} de capacitat, fins a quina capacitat la vols ampliar?");
-                    int num = Convert.ToInt32(Console.ReadLine());
-                    AmpliarBotiga(num);
-                    productes[nElements] = producte;
-                    Console.WriteLine("Producte afegit amb exit");
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
+            Console.WriteLine("No hi ha prou espai a la cistella. Amplia-la abans de continuar.");
+            return;
         }
 
-        public bool AfegirProductes(Producte[] producte)
+        if (producte == null)
         {
-            for (int i = 0; i < producte.Length; i++)
-            {
-                if (nElements < productes.Length)
-                {
-                    productes[nElements] = producte[i];
-                    nElements++;
-                }
-                else
-                {
-                    Console.WriteLine("La botiga està plena. Vols ampliar-la? (S/N)");
-                    string resposta = Console.ReadLine();
-                    if (resposta.ToLower() == "s")
-                    {
-                        Console.WriteLine($"La botiga ara té {productes.Length} de capacitat i queden {producte.Length - i} per afegir, fins a quina capacitat la vols ampliar?");
-                        int num = Convert.ToInt32(Console.ReadLine());
-                        AmpliarBotiga(num);
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Només s'han afegit {i} productes");
-                        return false;
-                    }
-                }
-            }
-            Console.WriteLine("S'han afegit tots els productes");
-            return true;
-        }
-        public void AmpliarBotiga(int num)
-        {
-            Array.Resize(ref productes, productes.Length + num);
+            Console.WriteLine("El producte no existeix.");
+            return;
         }
 
-        public bool ModificarPreu(string nomProducte, double preu)
+        if (producte.Quantitat < quantitat)
         {
-            for (int i = 0; i < nElements; i++)
-            {
-                if (productes[i].Nom == nomProducte)
-                {
-                    productes[i].Preu = preu;
-                    return true;
-                }
-            }
-            Console.WriteLine("Producte no trobat.");
-            return false;
+            Console.WriteLine("No hi ha prou stock del producte.");
+            return;
         }
 
-        public bool BuscarProducte(Producte producte)
+        double costTotal = producte.Preu() * quantitat;
+        if (diners < costTotal)
         {
-            foreach (Producte p in productes)
-            {
-                if (p == producte)
-                {
-                    return true;
-                }
-            }
-            return false;
+            Console.WriteLine("No tens prou diners per comprar aquest producte.");
+            return;
         }
 
-        public bool ModificarProducte(Producte producte, string nouNom, double nouPreu, int novaQuantitat)
+        // Añadir producto a la cesta
+        productes[nElements] = producte;
+        this.quantitat[nElements] = quantitat;
+        nElements++;
+
+        // Actualizar dinero
+        diners -= costTotal;
+
+        // Actualizar stock en la botiga
+        producte.Quantitat -= quantitat;
+
+        // Actualizar fecha
+        data = DateTime.Now;
+    }
+
+    public void ComprarProducte(Producte[] productes, int[] quantitats)
+    {
+        if (botiga == null)
         {
-            for (int i = 0; i < nElements; i++)
-            {
-                if (productes[i] == producte)
-                {
-                    productes[i].Nom = nouNom;
-                    productes[i].Preu = nouPreu;
-                    productes[i].Quantitat = novaQuantitat;
-                    return true;
-                }
-            }
-            return false;
+            Console.WriteLine("No s'ha assignat cap botiga a la cistella.");
+            return;
         }
-        public bool EsborrarProducte(Producte producte)
+
+        if (nElements + productes.Length > this.productes.Length)
         {
-            for (int i = 0; i < nElements; i++)
-            {
-                if (productes[i] == producte)
-                {
-                    for (int j = i; j < nElements - 1; j++)
-                    {
-                        productes[j] = productes[j + 1];
-                    }
-                    productes[nElements - 1] = null;
-                    nElements--;
-                    return true;
-                }
-            }
-            return false;
+            Console.WriteLine("No hi ha prou espai a la cistella. Amplia-la abans de continuar.");
+            return;
         }
-        public void Mostrar()
+
+        for (int i = 0; i < productes.Length; i++)
         {
-            if (nElements == 0)
-            {
-                Console.WriteLine("No hi ha productes a la botiga.");
-            }
-            else
-            {
-                Console.WriteLine($"Productes a la botiga '{nomBotiga}':");
-                for (int i = 0; i < productes.Length; i++)
-                {
-                    Producte producte = productes[i];
-                    if (producte != null)
-                    {
-                        Console.WriteLine($"{i + 1}. {producte}");
-                    }
-                }
-            }
-        }
-        public override string ToString()
-        {
-            string result = $"Botiga: {nomBotiga}\nProductes:\n";
-            for (int i = 0; i < nElements; i++)
-            {
-                result += $"{productes[i]}\n";
-            }
-            return result;
+            ComprarProducte(productes[i], quantitats[i]);
         }
     }
 
-    class Cistella
+    public void OrdernarCistella()
     {
-        private Producte[] productes;
-
-        public Cistella()
+        for (int i = 0; i < nElements - 1; i++)
         {
-            productes = new Producte[10];
-        }
-
-        public Producte[] Productes
-        {
-            get { return productes; }
-            set { productes = value; }
-        }
-
-        public int NElements
-        {
-            get
+            for (int j = 0; j < nElements - 1 - i; j++)
             {
-                int count = 0;
-                foreach (Producte producte in productes)
+                if (string.Compare(productes[j].Nom, productes[j + 1].Nom) > 0)
                 {
-                    if (producte != null)
-                    {
-                        count++;
-                    }
-                }
-                return count;
-            }
-        }
+                    Producte tempProducte = productes[j];
+                    productes[j] = productes[j + 1];
+                    productes[j + 1] = tempProducte;
 
-        public void ComprarProducte(Producte producte, int quantitat)
-        {
-            if (producte != null && quantitat > 0)
-            {
-                for (int i = 0; i < productes.Length; i++)
-                {
-                    if (productes[i] == null)
-                    {
-                        productes[i] = producte;
-                        producte.Quantitat -= quantitat;
-                        break;
-                    }
+                    int tempQuantitat = quantitat[j];
+                    quantitat[j] = quantitat[j + 1];
+                    quantitat[j + 1] = tempQuantitat;
                 }
             }
         }
+    }
+
+    public void Mostra()
+    {
+        Console.WriteLine($"Data de la compra: {data}");
+        Console.WriteLine("Productes comprats:");
+        for (int i = 0; i < nElements; i++)
+        {
+            Console.WriteLine($"Nom: {productes[i].Nom}, Quantitat: {quantitat[i]}, Preu unitari: {productes[i].Preu()}, Preu total: {productes[i].Preu() * quantitat[i]}");
+        }
+        Console.WriteLine($"Cost total amb IVA: {CostTotal()}");
+    }
+
+    public double CostTotal()
+    {
+        double costTotal = 0;
+        for (int i = 0; i < nElements; i++)
+        {
+            costTotal += productes[i].Preu() * quantitat[i];
+        }
+        return costTotal;
+    }
+
+    public override string ToString()
+    {
+        string result = $"Data de la compra: {data}\n";
+        result += "Productes comprats:\n";
+        for (int i = 0; i < nElements; i++)
+        {
+            result += $"Nom: {productes[i].Nom}, Quantitat: {quantitat[i]}, Preu unitari: {productes[i].Preu()}, Preu total: {productes[i].Preu() * quantitat[i]}\n";
+        }
+        result += $"Cost total amb IVA: {CostTotal()}\n";
+        return result;
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Botiga botiga = new Botiga("Supermercat XYZ", 10);
+        Cistella cistella = new Cistella();
+
+        while (true)
+        {
+            Console.WriteLine("Benvingut a la botiga virtual!");
+            Console.WriteLine("Escull una opció:");
+            Console.WriteLine("1. Gestionar Botiga");
+            Console.WriteLine("2. Gestionar Cistella");
+            Console.WriteLine("3. Sortir");
+
+            int opcio;
+            if (!int.TryParse(Console.ReadLine(), out opcio))
+            {
+                Console.WriteLine("Opció no vàlida. Si us plau, introdueix un nombre vàlid.");
+                continue;
+            }
+
+            switch (opcio)
+            {
+                case 1:
+                    GestionarBotiga(botiga);
+                    break;
+                case 2:
+                    GestionarCistella(botiga, cistella);
+                    break;
+                case 3:
+                    Console.WriteLine("Gràcies per utilitzar la botiga virtual. Fins aviat!");
+                    return;
+                default:
+                    Console.WriteLine("Opció no vàlida. Si us plau, introdueix un nombre vàlid.");
+                    break;
+            }
+        }
+    }
+
+    static void GestionarBotiga(Botiga botiga)
+    {
+        while (true)
+        {
+            Console.WriteLine("\nGestionar Botiga:");
+            Console.WriteLine("Escull una opció:");
+            Console.WriteLine("1. Afegir Producte");
+            Console.WriteLine("2. Mostrar Productes");
+            Console.WriteLine("3. Tornar al menú principal");
+
+            int opcio;
+            if (!int.TryParse(Console.ReadLine(), out opcio))
+            {
+                Console.WriteLine("Opció no vàlida. Si us plau, introdueix un nombre vàlid.");
+                continue;
+            }
+
+            switch (opcio)
+            {
+                case 1:
+                    AfegirProducte(botiga);
+                    break;
+                case 2:
+                    MostrarProductes(botiga);
+                    break;
+                case 3:
+                    return;
+                default:
+                    Console.WriteLine("Opció no vàlida. Si us plau, introdueix un nombre vàlid.");
+                    break;
+            }
+        }
+    }
+
+    static void AfegirProducte(Botiga botiga)
+    {
+        Console.WriteLine("Introdueix el nom del producte:");
+        string nom = Console.ReadLine();
+
+        Console.WriteLine("Introdueix el preu del producte:");
+        double preu;
+        if (!double.TryParse(Console.ReadLine(), out preu))
+        {
+            Console.WriteLine("Preu no vàlid. Si us plau, introdueix un preu vàlid.");
+            return;
+        }
+
+        Console.WriteLine("Introdueix la quantitat del producte:");
+        int quantitat;
+        if (!int.TryParse(Console.ReadLine(), out quantitat))
+        {
+            Console.WriteLine("Quantitat no vàlida. Si us plau, introdueix una quantitat vàlida.");
+            return;
+        }
+
+        Producte producte = new Producte(nom, preu, 0.21, quantitat); // Afegeixo 0.21 com a valor per defecte per l'IVA
+        if (botiga.AfegirProducte(producte))
+        {
+            Console.WriteLine("Producte afegit a la botiga amb èxit!");
+        }
+        else
+        {
+            Console.WriteLine("No s'ha pogut afegir el producte a la botiga.");
+        }
+    }
+
+    static void MostrarProductes(Botiga botiga)
+    {
+        Console.WriteLine("\nProductes a la Botiga:");
+        botiga.Mostrar();
+    }
+
+    static void GestionarCistella(Botiga botiga, Cistella cistella)
+    {
+        while (true)
+        {
+            Console.WriteLine("\nGestionar Cistella:");
+            Console.WriteLine("Escull una opció:");
+            Console.WriteLine("1. Comprar Producte");
+            Console.WriteLine("2. Mostrar Cistella");
+            Console.WriteLine("3. Tornar al menú principal");
+
+            int opcio;
+            if (!int.TryParse(Console.ReadLine(), out opcio))
+            {
+                Console.WriteLine("Opció no vàlida. Si us plau, introdueix un nombre vàlid.");
+                continue;
+            }
+
+            switch (opcio)
+            {
+                case 1:
+                    ComprarProducte(botiga, cistella);
+                    break;
+                case 2:
+                    MostrarCistella(cistella);
+                    break;
+                case 3:
+                    return;
+                default:
+                    Console.WriteLine("Opció no vàlida. Si us plau, introdueix un nombre vàlid.");
+                    break;
+            }
+        }
+    }
+
+    static void ComprarProducte(Botiga botiga, Cistella cistella)
+    {
+        Console.WriteLine("Introdueix el nom del producte que vols comprar:");
+        string nom = Console.ReadLine();
+
+        Console.WriteLine("Introdueix la quantitat del producte que vols comprar:");
+        int quantitat;
+        if (!int.TryParse(Console.ReadLine(), out quantitat))
+        {
+            Console.WriteLine("Quantitat no vàlida. Si us plau, introdueix una quantitat vàlida.");
+            return;
+        }
+
+        Producte producte = botiga[nom];
+        if (producte == null)
+        {
+            Console.WriteLine("Producte no trobat a la botiga.");
+            return;
+        }
+
+        cistella.ComprarProducte(producte, quantitat);
+    }
+
+    static void MostrarCistella(Cistella cistella)
+    {
+        Console.WriteLine("\nContingut de la Cistella:");
+        cistella.Mostra();
     }
 }
