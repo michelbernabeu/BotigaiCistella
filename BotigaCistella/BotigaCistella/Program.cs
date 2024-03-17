@@ -937,7 +937,6 @@ class Program
 
     static void ComprarProducte(Botiga botiga, Cistella cistella)
     {
-        cistella.MostrarBotiga();
         Console.WriteLine();
         Console.WriteLine("Introdueix el nom del producte que vols comprar:");
         string nom = Console.ReadLine();
