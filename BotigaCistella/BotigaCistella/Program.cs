@@ -753,7 +753,7 @@ class Program
 
             int opcio;
             opcio = Convert.ToInt32(Console.ReadLine());
-            while (opcio > 4 || opcio < 0)
+            while (opcio > 12 || opcio < -2)
             {
                 Console.WriteLine("Opció no vàlida. Si us plau, introdueix un nombre vàlid.");
                 opcio = Convert.ToInt32(Console.ReadLine());
@@ -896,7 +896,7 @@ class Program
 
             int opcio;
             opcio = Convert.ToInt32(Console.ReadLine());
-            while (opcio > 4 || opcio < 0)
+            while (opcio > 8 || opcio < -2)
             {
                 Console.WriteLine("Opció no vàlida. Si us plau, introdueix un nombre vàlid.");
                 opcio = Convert.ToInt32(Console.ReadLine());
